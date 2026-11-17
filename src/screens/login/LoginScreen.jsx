@@ -63,21 +63,22 @@ export const LoginScreen = ({ onLoginSuccess, onRegisterPress, onForgotPress }) 
 
   const navigate = useNavigation();
 
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const canSubmit = email.trim().length > 0 && password.length > 0 && !loading;
+  const canSubmit = username.trim().length > 0 && password.length > 0 && !loading;
 
   const handleLogin = async () => {
     if (!canSubmit) return;
     setLoading(true);
     setError('');
     try {
-      const response = await authenticate({ email: email.trim(), password });
+      const response = await authenticate({ username: username.trim(), password });
       onLoginSuccess?.(response);
+      handlePostLogin(response);
     } catch (e) {
       setError(e?.message || 'We could not sign you in. Check your details and try again.');
       setPassword(''); // never keep a rejected password in memory or on screen
@@ -85,6 +86,10 @@ export const LoginScreen = ({ onLoginSuccess, onRegisterPress, onForgotPress }) 
       setLoading(false);
     }
   };
+
+  const handlePostLogin = (response) => {
+    navigate.replace('Dashboard', { user: response.user });
+  }
 
   const clearError = () => error && setError('');
 
@@ -125,17 +130,17 @@ export const LoginScreen = ({ onLoginSuccess, onRegisterPress, onForgotPress }) 
             )}
 
             <Field
-              label="Email"
-              value={email}
+              label="Username"
+              value={username}
               onChangeText={(t) => {
-                setEmail(t);
+                setUsername(t);
                 clearError();
               }}
-              placeholder="you@example.com"
-              keyboardType="email-address"
+              placeholder="Enter your username"
+              keyboardType="default"
               autoCapitalize="none"
               autoCorrect={false}
-              autoComplete="email"
+              autoComplete="username"
               textContentType="username"
               returnKeyType="next"
               onSubmitEditing={() => passwordRef.current?.focus()}
