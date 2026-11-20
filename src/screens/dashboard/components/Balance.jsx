@@ -1,18 +1,39 @@
 import { Text, View } from "react-native"
 import { colors } from "../../../themes/colors"
+import { useAuth } from "../../../contexts/AuthContext"
+import { useEffect, useState } from "react"
+import { getAccountDetails } from "../../../services/BankingService"
+import axios from "axios"
 
 
-export const Balance = ({ accountDetails }) =>{
+export const Balance = () =>{
+
+    const [bankAccount, setBankAccount] = useState(null);
+    const {user} = useAuth();
+
+    const fetchBankAccount = async () => {
+        try {
+            const response = await getAccountDetails();
+            setBankAccount(response.data);
+        
+        } catch (error) {
+            console.error("Failed to fetch bank account:", error);
+        }
+    };
+
+    useEffect(()=>{
+        fetchBankAccount();
+    },[])
 
     return (
         <View style={styles.container}>
             <View style = {styles.accountNumberContainer}>
                 <Text style={{fontSize : 20, fontWeight : "bold" , marginBottom : 10}}>Current Account</Text>
-                <Text style={{fontSize : 15, fontWeight : "bold"}}>Account Number</Text>
-                <Text style={{fontSize : 10}}>XXXXXXXXXXX</Text>
+                <Text style={{fontSize : 15, fontWeigh : "bold"}}>Account Number</Text>
+                <Text style={{fontSize : 10}}>{bankAccount?.accountNumber}</Text>
             </View>
             <View style = {styles.balanceContainer}>
-                <Text style={{fontSize : 15, fontWeight : "bold"}}>12,000.00 DH</Text>
+                <Text style={{fontSize : 15, fontWeight : "bold"}}>{bankAccount?.balance},00 DH</Text>
             </View>
         </View>
     )
