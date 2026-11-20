@@ -6,7 +6,7 @@ export const AuthenticationAPI = axios.create({
 })
 
 AuthenticationAPI.interceptors.response.use(
-    (response)=> response,
+    (response)=> response?.data,
     (error) => {
         if (error.response && error.response.status === 401) {
             // Handle unauthorized error (e.g., redirect to login page)
