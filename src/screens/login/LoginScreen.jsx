@@ -13,10 +13,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { setUser, useAuth } from '../../contexts/AuthContext';
 
 import { colors } from '../../themes/colors';
 import { authenticate } from '../../services/AuthService';
 import {useNavigation} from '@react-navigation/native';
+import { AuthStorageService } from '../../services/AuthStorageService';
 
 // Brand colors come from your theme; neutrals are local so the screen is self-contained.
 const INK = colors.ink;
@@ -62,6 +64,7 @@ export const LoginScreen = ({ onLoginSuccess, onRegisterPress, onForgotPress }) 
   const passwordRef = useRef(null);
 
   const navigate = useNavigation();
+  const { login } = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -76,9 +79,9 @@ export const LoginScreen = ({ onLoginSuccess, onRegisterPress, onForgotPress }) 
     setLoading(true);
     setError('');
     try {
-      const response = await authenticate({ username: username.trim(), password });
-      onLoginSuccess?.(response);
-      handlePostLogin(response);
+      login(username, password);
+      //console.log('Login successful:', response.data);
+      handlePostLogin(null);
     } catch (e) {
       setError(e?.message || 'We could not sign you in. Check your details and try again.');
       setPassword(''); // never keep a rejected password in memory or on screen
@@ -88,7 +91,11 @@ export const LoginScreen = ({ onLoginSuccess, onRegisterPress, onForgotPress }) 
   };
 
   const handlePostLogin = (response) => {
-    navigate.replace('Dashboard', { user: response.user });
+    // Store JWT token and user data securely
+
+    // Store authenticated user in authentication context
+
+    navigate.replace('Dashboard');
   }
 
   const clearError = () => error && setError('');
